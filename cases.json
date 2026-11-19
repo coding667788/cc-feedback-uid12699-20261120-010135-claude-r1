@@ -1,0 +1,1643 @@
+{
+  "format": "sandbox-cases/1",
+  "description": "Replayable capability-check scenarios. Every step is offline and deterministic; see README for the mapping from case to rule.",
+  "cases": [
+    {
+      "case_id": "01_basic_allow_deny",
+      "steps": [
+        {
+          "op": "set_clock",
+          "now_ms": 1000,
+          "label": "01#00"
+        },
+        {
+          "op": "create_process",
+          "process": "p1",
+          "label": "01#01"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r1",
+          "tenant": "t1",
+          "label": "01#02"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "01#03"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "read",
+          "label": "01#04"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "write",
+          "label": "01#05"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "list",
+          "label": "01#06"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "read",
+          "resource": "r1",
+          "tenant": "t1",
+          "label": "01#07"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "read",
+          "resource": "r1",
+          "tenant": "other",
+          "label": "01#08"
+        }
+      ]
+    },
+    {
+      "case_id": "02_transfer_attenuation",
+      "steps": [
+        {
+          "op": "set_clock",
+          "now_ms": 1000,
+          "label": "02#00"
+        },
+        {
+          "op": "create_process",
+          "process": "p1",
+          "label": "02#01"
+        },
+        {
+          "op": "create_process",
+          "process": "p2",
+          "label": "02#02"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r1",
+          "tenant": "t1",
+          "label": "02#03"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "read",
+            "write",
+            "list"
+          ],
+          "label": "02#04"
+        },
+        {
+          "op": "transfer",
+          "parent": {
+            "process": "p1",
+            "handle": 1
+          },
+          "to_process": "p2",
+          "handle": 4,
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "02#05"
+        },
+        {
+          "op": "transfer",
+          "parent": {
+            "process": "p2",
+            "handle": 4,
+            "generation": 1
+          },
+          "to_process": "p1",
+          "handle": 9,
+          "rights": [
+            "read"
+          ],
+          "label": "02#06"
+        },
+        {
+          "op": "check",
+          "process": "p2",
+          "handle": 4,
+          "method": "write",
+          "label": "02#07"
+        },
+        {
+          "op": "check",
+          "process": "p2",
+          "handle": 4,
+          "method": "list",
+          "label": "02#08"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 9,
+          "method": "read",
+          "label": "02#09"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 9,
+          "method": "write",
+          "label": "02#10"
+        },
+        {
+          "op": "transfer",
+          "parent": {
+            "process": "p1",
+            "handle": 9
+          },
+          "to_process": "p2",
+          "handle": 12,
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "02#11"
+        },
+        {
+          "op": "transfer",
+          "parent": {
+            "process": "p1",
+            "handle": 9
+          },
+          "to_process": "p2",
+          "handle": 13,
+          "rights": [
+            "read"
+          ],
+          "not_after": 99999999999,
+          "label": "02#12"
+        },
+        {
+          "op": "transfer",
+          "parent": {
+            "process": "p1",
+            "handle": 9
+          },
+          "to_process": "p2",
+          "handle": 14,
+          "rights": [
+            "read"
+          ],
+          "not_after": 1500,
+          "label": "02#13"
+        },
+        {
+          "op": "check",
+          "process": "p2",
+          "handle": 14,
+          "method": "read",
+          "label": "02#14"
+        },
+        {
+          "op": "set_clock",
+          "now_ms": 1600,
+          "label": "02#15"
+        },
+        {
+          "op": "check",
+          "process": "p2",
+          "handle": 14,
+          "method": "read",
+          "label": "02#16"
+        }
+      ]
+    },
+    {
+      "case_id": "03_multi_sandbox_intersection",
+      "steps": [
+        {
+          "op": "set_clock",
+          "now_ms": 1000,
+          "label": "03#00"
+        },
+        {
+          "op": "create_process",
+          "process": "p1",
+          "label": "03#01"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r1",
+          "tenant": "t1",
+          "label": "03#02"
+        },
+        {
+          "op": "create_sandbox",
+          "sandbox": "sb_ro",
+          "rights": [
+            "read",
+            "list"
+          ],
+          "label": "03#03"
+        },
+        {
+          "op": "create_sandbox",
+          "sandbox": "sb_nolist",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "03#04"
+        },
+        {
+          "op": "create_sandbox",
+          "sandbox": "sb_all",
+          "rights": [
+            "read",
+            "write",
+            "list"
+          ],
+          "label": "03#05"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "read",
+            "write",
+            "list"
+          ],
+          "sandboxes": [
+            "sb_ro",
+            "sb_all"
+          ],
+          "label": "03#06"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "read",
+          "label": "03#07"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "write",
+          "label": "03#08"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "list",
+          "label": "03#09"
+        },
+        {
+          "op": "tighten_sandbox",
+          "sandbox": "sb_all",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "03#10"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "list",
+          "label": "03#11"
+        },
+        {
+          "op": "tighten_sandbox",
+          "sandbox": "sb_all",
+          "rights": [
+            "write"
+          ],
+          "label": "03#12"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "read",
+          "label": "03#13"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "write",
+          "label": "03#14"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "list",
+          "label": "03#15"
+        },
+        {
+          "op": "tighten_sandbox",
+          "sandbox": "sb_all",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "03#16"
+        }
+      ]
+    },
+    {
+      "case_id": "04_restart_invalidates_descendants",
+      "steps": [
+        {
+          "op": "set_clock",
+          "now_ms": 1000,
+          "label": "04#00"
+        },
+        {
+          "op": "create_process",
+          "process": "p1",
+          "label": "04#01"
+        },
+        {
+          "op": "create_process",
+          "process": "p2",
+          "label": "04#02"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r1",
+          "tenant": "t1",
+          "label": "04#03"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "04#04"
+        },
+        {
+          "op": "transfer",
+          "parent": {
+            "process": "p1",
+            "handle": 1
+          },
+          "to_process": "p2",
+          "handle": 2,
+          "rights": [
+            "read"
+          ],
+          "label": "04#05"
+        },
+        {
+          "op": "check",
+          "process": "p2",
+          "handle": 2,
+          "method": "read",
+          "label": "04#06"
+        },
+        {
+          "op": "restart_process",
+          "process": "p1",
+          "label": "04#07"
+        },
+        {
+          "op": "check",
+          "process": "p2",
+          "handle": 2,
+          "method": "read",
+          "label": "04#08"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "read",
+          "label": "04#09"
+        },
+        {
+          "op": "transfer",
+          "parent": {
+            "process": "p1",
+            "handle": 1
+          },
+          "to_process": "p2",
+          "handle": 3,
+          "rights": [
+            "read"
+          ],
+          "label": "04#10"
+        }
+      ]
+    },
+    {
+      "case_id": "05_resource_rebuild",
+      "steps": [
+        {
+          "op": "set_clock",
+          "now_ms": 1000,
+          "label": "05#00"
+        },
+        {
+          "op": "create_process",
+          "process": "p1",
+          "label": "05#01"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r1",
+          "tenant": "t1",
+          "label": "05#02"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "05#03"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "read",
+          "label": "05#04"
+        },
+        {
+          "op": "rebuild_resource",
+          "resource": "r1",
+          "label": "05#05"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "read",
+          "label": "05#06"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "read"
+          ],
+          "label": "05#07"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "read",
+          "label": "05#08"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "read",
+          "generation": 1,
+          "label": "05#09"
+        }
+      ]
+    },
+    {
+      "case_id": "06_handle_number_reuse",
+      "steps": [
+        {
+          "op": "set_clock",
+          "now_ms": 1000,
+          "label": "06#00"
+        },
+        {
+          "op": "create_process",
+          "process": "p1",
+          "label": "06#01"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r1",
+          "tenant": "t1",
+          "label": "06#02"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 7,
+          "resource": "r1",
+          "rights": [
+            "read"
+          ],
+          "label": "06#03"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 7,
+          "resource": "r1",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "06#04"
+        },
+        {
+          "op": "list_slot",
+          "process": "p1",
+          "handle": 7,
+          "label": "06#05"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 7,
+          "method": "write",
+          "generation": 1,
+          "label": "06#06"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 7,
+          "method": "write",
+          "generation": 2,
+          "label": "06#07"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 7,
+          "resource": "r1",
+          "rights": [
+            "read"
+          ],
+          "generation": 1,
+          "label": "06#08"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 7,
+          "resource": "r1",
+          "rights": [
+            "read"
+          ],
+          "generation": 9,
+          "label": "06#09"
+        },
+        {
+          "op": "list_slot",
+          "process": "p1",
+          "handle": 7,
+          "label": "06#10"
+        }
+      ]
+    },
+    {
+      "case_id": "07_parent_revoke",
+      "steps": [
+        {
+          "op": "set_clock",
+          "now_ms": 1000,
+          "label": "07#00"
+        },
+        {
+          "op": "create_process",
+          "process": "p1",
+          "label": "07#01"
+        },
+        {
+          "op": "create_process",
+          "process": "p2",
+          "label": "07#02"
+        },
+        {
+          "op": "create_process",
+          "process": "p3",
+          "label": "07#03"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r1",
+          "tenant": "t1",
+          "label": "07#04"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "read",
+            "write",
+            "list"
+          ],
+          "label": "07#05"
+        },
+        {
+          "op": "transfer",
+          "parent": {
+            "process": "p1",
+            "handle": 1
+          },
+          "to_process": "p2",
+          "handle": 2,
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "07#06"
+        },
+        {
+          "op": "transfer",
+          "parent": {
+            "process": "p2",
+            "handle": 2
+          },
+          "to_process": "p3",
+          "handle": 3,
+          "rights": [
+            "read"
+          ],
+          "label": "07#07"
+        },
+        {
+          "op": "check",
+          "process": "p3",
+          "handle": 3,
+          "method": "read",
+          "label": "07#08"
+        },
+        {
+          "op": "revoke",
+          "process": "p2",
+          "handle": 2,
+          "label": "07#09"
+        },
+        {
+          "op": "check",
+          "process": "p3",
+          "handle": 3,
+          "method": "read",
+          "label": "07#10"
+        },
+        {
+          "op": "handle_info",
+          "process": "p3",
+          "handle": 3,
+          "label": "07#11"
+        },
+        {
+          "op": "check",
+          "process": "p2",
+          "handle": 2,
+          "method": "read",
+          "label": "07#12"
+        },
+        {
+          "op": "transfer",
+          "parent": {
+            "process": "p1",
+            "handle": 1
+          },
+          "to_process": "p2",
+          "handle": 5,
+          "rights": [
+            "read"
+          ],
+          "label": "07#13"
+        },
+        {
+          "op": "check",
+          "process": "p2",
+          "handle": 5,
+          "method": "read",
+          "label": "07#14"
+        }
+      ]
+    },
+    {
+      "case_id": "08_regrant_does_not_revive",
+      "steps": [
+        {
+          "op": "set_clock",
+          "now_ms": 1000,
+          "label": "08#00"
+        },
+        {
+          "op": "create_process",
+          "process": "p1",
+          "label": "08#01"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r1",
+          "tenant": "t1",
+          "label": "08#02"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "08#03"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "read",
+          "label": "08#04"
+        },
+        {
+          "op": "revoke",
+          "process": "p1",
+          "handle": 1,
+          "label": "08#05"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "read",
+          "label": "08#06"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "08#07"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "read",
+          "generation": 1,
+          "label": "08#08"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "read",
+          "generation": 2,
+          "label": "08#09"
+        },
+        {
+          "op": "list_slot",
+          "process": "p1",
+          "handle": 1,
+          "label": "08#10"
+        }
+      ]
+    },
+    {
+      "case_id": "09_protected_io_modes",
+      "steps": [
+        {
+          "op": "set_clock",
+          "now_ms": 1000,
+          "label": "09#00"
+        },
+        {
+          "op": "create_process",
+          "process": "p1",
+          "label": "09#01"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r1",
+          "tenant": "t1",
+          "label": "09#02"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r2",
+          "tenant": "t1",
+          "label": "09#03"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r3",
+          "tenant": "t1",
+          "label": "09#04"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "09#05"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 2,
+          "resource": "r2",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "09#06"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 3,
+          "resource": "r3",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "09#07"
+        },
+        {
+          "op": "protected_io",
+          "op_id": "txn-001",
+          "process": "p1",
+          "mode": "all_or_nothing",
+          "items": [
+            {
+              "handle": 1,
+              "method": "write",
+              "resource": "r1",
+              "payload": "a"
+            },
+            {
+              "handle": 2,
+              "method": "write",
+              "resource": "r2",
+              "payload": "b"
+            },
+            {
+              "handle": 3,
+              "method": "write",
+              "resource": "r3",
+              "payload": "c"
+            }
+          ],
+          "label": "09#08"
+        },
+        {
+          "op": "protected_io",
+          "op_id": "txn-001",
+          "process": "p1",
+          "mode": "all_or_nothing",
+          "items": [
+            {
+              "handle": 1,
+              "method": "write",
+              "resource": "r1",
+              "payload": "a"
+            },
+            {
+              "handle": 2,
+              "method": "write",
+              "resource": "r2",
+              "payload": "b"
+            },
+            {
+              "handle": 3,
+              "method": "write",
+              "resource": "r3",
+              "payload": "c"
+            }
+          ],
+          "label": "09#09"
+        },
+        {
+          "op": "revoke",
+          "process": "p1",
+          "handle": 2,
+          "label": "09#10"
+        },
+        {
+          "op": "protected_io",
+          "op_id": "txn-002",
+          "process": "p1",
+          "mode": "all_or_nothing",
+          "items": [
+            {
+              "handle": 1,
+              "method": "write",
+              "resource": "r1",
+              "payload": "a"
+            },
+            {
+              "handle": 2,
+              "method": "write",
+              "resource": "r2",
+              "payload": "b"
+            },
+            {
+              "handle": 3,
+              "method": "write",
+              "resource": "r3",
+              "payload": "c"
+            }
+          ],
+          "label": "09#11"
+        },
+        {
+          "op": "protected_io",
+          "op_id": "txn-003",
+          "process": "p1",
+          "mode": "best_effort",
+          "items": [
+            {
+              "handle": 1,
+              "method": "write",
+              "resource": "r1",
+              "payload": "a"
+            },
+            {
+              "handle": 2,
+              "method": "write",
+              "resource": "r2",
+              "payload": "b"
+            }
+          ],
+          "label": "09#12"
+        },
+        {
+          "op": "io_audit",
+          "label": "09#13"
+        }
+      ]
+    },
+    {
+      "case_id": "10_precheck_staleness",
+      "steps": [
+        {
+          "op": "set_clock",
+          "now_ms": 1000,
+          "label": "10#00"
+        },
+        {
+          "op": "create_process",
+          "process": "p1",
+          "label": "10#01"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r1",
+          "tenant": "t1",
+          "label": "10#02"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r2",
+          "tenant": "t1",
+          "label": "10#03"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "10#04"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 2,
+          "resource": "r2",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "10#05"
+        },
+        {
+          "op": "precheck",
+          "process": "p1",
+          "handle": 1,
+          "method": "write",
+          "ttl_ms": 500,
+          "label": "10#06"
+        },
+        {
+          "op": "rebuild_resource",
+          "resource": "r1",
+          "label": "10#07"
+        },
+        {
+          "op": "set_clock",
+          "now_ms": 1100,
+          "label": "10#08"
+        },
+        {
+          "op": "protected_io",
+          "op_id": "txn-010",
+          "process": "p1",
+          "mode": "all_or_nothing",
+          "items": [
+            {
+              "handle": 1,
+              "method": "write",
+              "resource": "r1",
+              "payload": "late",
+              "precheck": "P0001"
+            }
+          ],
+          "label": "10#09"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "10#10"
+        },
+        {
+          "op": "precheck",
+          "process": "p1",
+          "handle": 1,
+          "method": "write",
+          "ttl_ms": 500,
+          "label": "10#11"
+        },
+        {
+          "op": "protected_io",
+          "op_id": "txn-011",
+          "process": "p1",
+          "mode": "all_or_nothing",
+          "items": [
+            {
+              "handle": 1,
+              "method": "write",
+              "resource": "r1",
+              "payload": "ok",
+              "precheck": "P0002"
+            }
+          ],
+          "label": "10#12"
+        },
+        {
+          "op": "protected_io",
+          "op_id": "txn-012",
+          "process": "p1",
+          "mode": "all_or_nothing",
+          "items": [
+            {
+              "handle": 1,
+              "method": "write",
+              "resource": "r1",
+              "payload": "again",
+              "precheck": "P0002"
+            }
+          ],
+          "label": "10#13"
+        },
+        {
+          "op": "precheck",
+          "process": "p1",
+          "handle": 2,
+          "method": "write",
+          "ttl_ms": 100,
+          "label": "10#14"
+        },
+        {
+          "op": "set_clock",
+          "now_ms": 1300,
+          "label": "10#15"
+        },
+        {
+          "op": "protected_io",
+          "op_id": "txn-013",
+          "process": "p1",
+          "mode": "all_or_nothing",
+          "items": [
+            {
+              "handle": 2,
+              "method": "write",
+              "resource": "r2",
+              "payload": "expired",
+              "precheck": "P0003"
+            }
+          ],
+          "label": "10#16"
+        },
+        {
+          "op": "protected_io",
+          "op_id": "txn-014",
+          "process": "p1",
+          "mode": "all_or_nothing",
+          "items": [
+            {
+              "handle": 2,
+              "method": "write",
+              "resource": "r2",
+              "payload": "never",
+              "precheck": "P9999"
+            }
+          ],
+          "label": "10#17"
+        },
+        {
+          "op": "precheck",
+          "process": "p1",
+          "handle": 2,
+          "method": "read",
+          "ttl_ms": 500,
+          "label": "10#18"
+        },
+        {
+          "op": "protected_io",
+          "op_id": "txn-015",
+          "process": "p1",
+          "mode": "all_or_nothing",
+          "items": [
+            {
+              "handle": 2,
+              "method": "write",
+              "resource": "r2",
+              "payload": "swapped",
+              "precheck": "P0004"
+            }
+          ],
+          "label": "10#19"
+        },
+        {
+          "op": "io_audit",
+          "label": "10#20"
+        }
+      ]
+    },
+    {
+      "case_id": "11_rights_exchange",
+      "steps": [
+        {
+          "op": "set_clock",
+          "now_ms": 1000,
+          "label": "11#00"
+        },
+        {
+          "op": "create_process",
+          "process": "p1",
+          "label": "11#01"
+        },
+        {
+          "op": "create_process",
+          "process": "p2",
+          "label": "11#02"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r1",
+          "tenant": "t1",
+          "label": "11#03"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "11#04"
+        },
+        {
+          "op": "transfer",
+          "parent": {
+            "process": "p1",
+            "handle": 1
+          },
+          "to_process": "p2",
+          "handle": 2,
+          "rights": [
+            "read"
+          ],
+          "label": "11#05"
+        },
+        {
+          "op": "check",
+          "process": "p2",
+          "handle": 2,
+          "method": "read",
+          "label": "11#06"
+        },
+        {
+          "op": "create_process",
+          "process": "p3",
+          "label": "11#07"
+        },
+        {
+          "op": "transfer",
+          "parent": {
+            "process": "p2",
+            "handle": 2
+          },
+          "to_process": "p3",
+          "handle": 3,
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "11#08"
+        },
+        {
+          "op": "transfer",
+          "parent": {
+            "process": "p2",
+            "handle": 2
+          },
+          "to_process": "p3",
+          "handle": 3,
+          "rights": [
+            "read"
+          ],
+          "label": "11#09"
+        },
+        {
+          "op": "check",
+          "process": "p3",
+          "handle": 3,
+          "method": "write",
+          "label": "11#10"
+        },
+        {
+          "op": "check",
+          "process": "p3",
+          "handle": 3,
+          "method": "read",
+          "label": "11#11"
+        }
+      ]
+    },
+    {
+      "case_id": "12_read_write_swap",
+      "steps": [
+        {
+          "op": "set_clock",
+          "now_ms": 1000,
+          "label": "12#00"
+        },
+        {
+          "op": "create_process",
+          "process": "p1",
+          "label": "12#01"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r1",
+          "tenant": "t1",
+          "label": "12#02"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "read"
+          ],
+          "label": "12#03"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 2,
+          "resource": "r1",
+          "rights": [
+            "write"
+          ],
+          "label": "12#04"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "write",
+          "label": "12#05"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 2,
+          "method": "read",
+          "label": "12#06"
+        },
+        {
+          "op": "revoke",
+          "process": "p1",
+          "handle": 1,
+          "label": "12#07"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "write"
+          ],
+          "generation": 3,
+          "label": "12#08"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "write",
+          "label": "12#09"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "read",
+          "label": "12#10"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 2,
+          "method": "write",
+          "label": "12#11"
+        },
+        {
+          "op": "protected_io",
+          "op_id": "txn-012",
+          "process": "p1",
+          "mode": "all_or_nothing",
+          "items": [
+            {
+              "handle": 1,
+              "method": "write",
+              "resource": "r1",
+              "payload": "one"
+            },
+            {
+              "handle": 2,
+              "method": "write",
+              "resource": "r1",
+              "payload": "two"
+            }
+          ],
+          "label": "12#12"
+        },
+        {
+          "op": "rebuild_resource",
+          "resource": "r1",
+          "label": "12#13"
+        },
+        {
+          "op": "protected_io",
+          "op_id": "txn-012",
+          "process": "p1",
+          "mode": "all_or_nothing",
+          "items": [
+            {
+              "handle": 2,
+              "method": "write",
+              "resource": "r1",
+              "payload": "two"
+            },
+            {
+              "handle": 1,
+              "method": "write",
+              "resource": "r1",
+              "payload": "one"
+            }
+          ],
+          "label": "12#14"
+        }
+      ]
+    },
+    {
+      "case_id": "13_sandbox_tightening",
+      "steps": [
+        {
+          "op": "set_clock",
+          "now_ms": 1000,
+          "label": "13#00"
+        },
+        {
+          "op": "create_process",
+          "process": "p1",
+          "label": "13#01"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r1",
+          "tenant": "t1",
+          "label": "13#02"
+        },
+        {
+          "op": "create_sandbox",
+          "sandbox": "sb",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "label": "13#03"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "read",
+            "write"
+          ],
+          "sandboxes": [
+            "sb"
+          ],
+          "label": "13#04"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "write",
+          "label": "13#05"
+        },
+        {
+          "op": "tighten_sandbox",
+          "sandbox": "sb",
+          "rights": [],
+          "label": "13#06"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "write",
+          "label": "13#07"
+        },
+        {
+          "op": "check",
+          "process": "p1",
+          "handle": 1,
+          "method": "read",
+          "label": "13#08"
+        },
+        {
+          "op": "handle_info",
+          "process": "p1",
+          "handle": 1,
+          "label": "13#09"
+        }
+      ]
+    },
+    {
+      "case_id": "14_error_codes",
+      "steps": [
+        {
+          "op": "set_clock",
+          "now_ms": 1000,
+          "label": "14#00"
+        },
+        {
+          "op": "create_process",
+          "process": "p1",
+          "label": "14#01"
+        },
+        {
+          "op": "create_resource",
+          "resource": "r1",
+          "tenant": "t1",
+          "label": "14#02"
+        },
+        {
+          "op": "check",
+          "process": "nobody",
+          "handle": 1,
+          "method": "read",
+          "label": "14#03"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "missing",
+          "rights": [
+            "read"
+          ],
+          "label": "14#04"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "write"
+          ],
+          "sandboxes": [
+            "nope"
+          ],
+          "label": "14#05"
+        },
+        {
+          "op": "set_clock",
+          "now_ms": 999,
+          "label": "14#06"
+        },
+        {
+          "op": "grant",
+          "process": "p1",
+          "handle": 1,
+          "resource": "r1",
+          "rights": [
+            "fly"
+          ],
+          "label": "14#07"
+        },
+        {
+          "op": "create_process",
+          "process": "p1",
+          "label": "14#08"
+        },
+        {
+          "op": "revoke",
+          "process": "p1",
+          "handle": 44,
+          "label": "14#09"
+        },
+        {
+          "op": "protected_io",
+          "op_id": "bad",
+          "process": "p1",
+          "mode": "nope",
+          "items": [
+            {
+              "handle": 1,
+              "method": "read"
+            }
+          ],
+          "label": "14#10"
+        },
+        {
+          "op": "protected_io",
+          "op_id": "bad2",
+          "process": "p1",
+          "items": [],
+          "label": "14#11"
+        },
+        {
+          "op": "no_such_op",
+          "label": "14#12"
+        }
+      ]
+    }
+  ]
+}
